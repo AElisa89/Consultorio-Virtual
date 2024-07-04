@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentación</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .container {
+            text-align: center;
+        }
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .options label {
+            display: block;
+            background-color: #f2f2f2;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            text-align: center;
+            width: 200px;
+        }
+        .options input[type="checkbox"] {
+            display: none;
+        }
+        .options input[type="checkbox"]:checked + label {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .results p {
+            margin: 5px;
+        }
+        .results p.correct {
+            color: green;
+        }
+        .results p.incorrect {
+            color: red;
+        }
+        .next {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .next:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <button onclick="window.history.back()" class="back">Volver</button>
+            <h1>Documentación</h1>
+            <button onclick="window.location.href='index.html'" class="home">Inicio</button>
+        </header>
+        <main>
+            <p>Antes de avanzar necesitamos pedirle al consultante la documentación necesaria</p>
+            <p>Marcar todas las opciones correctas</p>
+
+            <div class="options" id="doc-options">
+                <!-- Opciones de documentación se cargarán aquí -->
+            </div>
+            <div class="results" id="doc-results">
+                <!-- Resultados de documentación se mostrarán aquí -->
+            </div>
+            
+        </main>
+        <footer>
+            <button onclick="checkDocs()" class="next">Verificar</button>
+            <button id="next-button" class="next" style="display: none;" onclick="proceedToSecondConsultation()">Avanzar a segunda consulta</button>
+        </footer>
+    </div>
+
+    <script>
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const consultantId = urlParams.get('consultant');
+
+        const docs = {
+            1: ['Documento1', 'Documento2', 'Documento3', 'Documento4', 'Documento5'],
+            2: ['Documento1', 'Documento2', 'Documento3', 'Documento4', 'Documento5'],
+            3: ['DNI del consulante', 
+            'Últimos recibos de sueldo', 
+            'DNI de l@s hij@s', 
+            'Partida(s) de nacimiento', 
+            'Copia de denuncias anteriores', 
+            'Depósito para "Gastos Administrativos"',
+            'Extractos de billeteras virtuales, MercadoPago, etc.',
+            'Tickets y recibos de gastos mensuales'
+        ],
+
+            4: ['DNI del consulante', 
+            'Últimos recibos de sueldo', 
+            'DNI de l@s hij@s', 
+            'Partida(s) de nacimiento', 
+            'Depósito para "Gastos Administrativos"',
+            'Extractos de billeteras virtuales, MercadoPago, etc.',
+            'Tickets y recibos de gastos mensuales'
+        ]
+        };
+
+        const correctDocs = {
+            1: [true, false, true, false, true],
+            2: [true, true, false, false, true],
+            3: [true, false, true, true, true, false, true, false],
+            4: [true, false, true, true, false, false, true]
+        };
+
+        let selectedDocs = Array(docs[consultantId].length).fill(false);
+
+        function renderDocs() {
+            const container = document.getElementById('doc-options');
+            container.innerHTML = '';
+            docs[consultantId].forEach((option, index) => {
+                container.innerHTML += `
+                    <div>
+                        <input type="checkbox" id="doc${index}" name="docs" value="${option}" onchange="selectDoc(${index})">
+                        <label for="doc${index}">${option}</label>
+                    </div>
+                `;
+            });
+        }
+
+        function selectDoc(index) {
+            selectedDocs[index] = !selectedDocs[index];
+        }
+
+        function checkDocs() {
+            const resultsContainer = document.getElementById('doc-results');
+            resultsContainer.innerHTML = '';
+            docs[consultantId].forEach((option, index) => {
+                const isCorrect = selectedDocs[index] === correctDocs[consultantId][index];
+                const colorClass = isCorrect ? 'correct' : 'incorrect';
+                resultsContainer.innerHTML += `<p class="${colorClass}">${option}: ${isCorrect ? 'Correcto' : 'Incorrecto'}</p>`;
+            });
+            document.getElementById('next-button').style.display = 'block';
+        }
+
+        function proceedToSecondConsultation() {
+            window.location.href = `second-consultation.html?consultant=${consultantId}`;
+        }
+
+        renderDocs();
+    </script>
+</body>
+</html>
